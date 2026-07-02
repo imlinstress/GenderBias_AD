@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/me/Documents/Repos/GenderBias_AD/fairness-ad-app/scripts/../model/ad_model.ckpt"
+all_model_checkpoint_paths: "/home/me/Documents/Repos/GenderBias_AD/fairness-ad-app/scripts/../model/ad_model.ckpt"

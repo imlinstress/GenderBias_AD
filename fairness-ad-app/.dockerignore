@@ -1,0 +1,5 @@
+data/*.db
+model/ad_model_retrained*
+__pycache__/
+.venv/
+.git/

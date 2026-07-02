@@ -1,0 +1,24 @@
+# Core
+fastapi>=0.104,<0.106
+uvicorn>=0.24
+numpy>=1.24
+pandas>=1.5
+scikit-learn>=1.2
+scipy>=1.10
+
+# aif360 + TF (required for AD model)
+aif360==0.6.1
+tensorflow>=2.15.0
+
+# Imbalance
+imbalanced-learn>=0.10
+
+# Explainability
+shap>=0.41
+lime>=0.2
+
+# Storage
+joblib>=1.2
+
+# Optional plotting (not used in API, but available)
+matplotlib>=3.7

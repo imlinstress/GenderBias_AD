@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fair AD Predictor</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">🔬 Fair AD Predictor</span>
+    <div class="nav-links">
+      <button class="nav-btn active" data-tab="predict">Predict</button>
+      <button class="nav-btn" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn" data-tab="history">History</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <!-- ── Predict Tab ── -->
+  <section id="tab-predict" class="tab active">
+    <div class="card">
+      <h2>Patient Assessment</h2>
+      <div class="form-row">
+        <label class="hint" data-tooltip="0=Male (privileged), 1=Female (unprivileged) for fairness audit">Sex</label>
+        <select id="input-sex">
+          <option value="0">Male</option>
+          <option value="1">Female</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Patient age in years (55–95)">Age</label>
+        <input type="number" id="input-age" value="75" min="55" max="95">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Mini-Mental State Exam (0–30). Lower = more cognitive impairment">MMSE Score</label>
+        <input type="number" id="input-mmse" value="26" min="0" max="30" step="0.1">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Functional Activities Questionnaire (0–30). Higher = more functional impairment">FAQ Total</label>
+        <input type="number" id="input-faq" value="5" min="0" max="30">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Clinical Dementia Rating Sum of Boxes (0–18). Higher = more severe dementia">CDR (Sum of Boxes)</label>
+        <input type="number" id="input-cdr" value="2.5" min="0" max="18" step="0.5">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Number of APOE ε4 alleles (0/1/2). Genetic risk factor for Alzheimer's">APOE4 Alleles (0/1/2)</label>
+        <input type="number" id="input-apoe" value="1" min="0" max="2">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Normalized left hippocampal volume. Lower volume = more brain atrophy">Left Hippocampus Volume</label>
+        <input type="number" id="input-lhippo" value="3200" min="1000" max="5000" step="10">
+      </div>
+      <div class="form-row">
+        <label class="hint" data-tooltip="Normalized right hippocampal volume. Lower volume = more brain atrophy">Right Hippocampus Volume</label>
+        <input type="number" id="input-rhippo" value="3300" min="1000" max="5000" step="10">
+      </div>
+      <button id="btn-predict" class="btn-primary">Run Assessment</button>
+    </div>
+
+    <div id="result-area" class="card hidden">
+      <h2>Prediction Result</h2>
+      <div id="result-badge" class="result-badge"></div>
+      <div class="result-metrics">
+        <div class="metric">
+          <span class="metric-label hint" data-tooltip="Raw AD probability from model (0–1). Female scores get +Δ before thresholding">Confidence</span>
+          <span id="result-confidence" class="metric-value">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label hint" data-tooltip="Cutoff applied after calibration. Calibrated score ≥ 0.0346 → predicted AD">Threshold</span>
+          <span id="result-threshold" class="metric-value">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label hint" data-tooltip="+0.010 added to every female raw score to align score distributions. Closes EOD from −0.165 → 0.000. Delta = male − female median score (0.0054 raw), tuned via grid search">Calibration</span>
+          <span id="result-calibration" class="metric-value">--</span>
+        </div>
+      </div>
+      <div id="shap-area" class="hidden">
+        <h3>Top Features Driving Prediction</h3>
+        <div id="shap-bars"></div>
+      </div>
+      <div class="correction-area">
+        <p class="correction-prompt">Was this prediction correct?</p>
+        <div class="correction-btns">
+          <button class="btn-correct" data-label="1">✅ Yes, AD</button>
+          <button class="btn-correct" data-label="0">✅ Yes, MCI</button>
+          <button class="btn-wrong">✗ Wrong — submit correction</button>
+        </div>
+        <div id="correction-feedback" class="hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Dashboard Tab ── -->
+  <section id="tab-dashboard" class="tab">
+    <div class="card">
+      <h2>Fairness Dashboard</h2>
+      <div id="dashboard-loading">Loading...</div>
+      <div id="dashboard-content" class="hidden">
+        <div class="dashboard-grid">
+          <div class="stat-box">
+            <span class="stat-label hint" data-tooltip="Number of assessments run through the app">Total Predictions</span>
+            <span id="stat-n" class="stat-value">--</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label hint" data-tooltip="Average of sensitivity (TPR) and specificity (TNR). Ideal = 1.0">Balanced Accuracy</span>
+            <span id="stat-ba" class="stat-value">--</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label hint" data-tooltip="Ratio of AD prediction rates: Female / Male. Ideal = 1.0">Disparate Impact</span>
+            <span id="stat-di" class="stat-value">--</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label hint" data-tooltip="TPR difference: Female − Male. 0 = perfect equal opportunity">Equal Opp. Diff (EOD)</span>
+            <span id="stat-eod" class="stat-value">--</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label hint" data-tooltip="Average of TPR difference and FPR difference across sexes. 0 = perfect fairness">Avg Odds Diff (AOD)</span>
+            <span id="stat-aod" class="stat-value">--</span>
+          </div>
+        </div>
+        <div id="metrics-placeholder" class="hidden" style="text-align:center;padding:1.5rem;color:var(--text-secondary);font-style:italic;">
+          Submit corrections to see fairness metrics
+        </div>
+        <div class="sex-stats">
+          <div class="sex-stat">
+            <h4>Male</h4>
+            <p>N: <span id="sex-male-n">--</span></p>
+            <p>AD predictions: <span id="sex-male-ad">--</span></p>
+            <p>Mean score: <span id="sex-male-score">--</span></p>
+          </div>
+          <div class="sex-stat">
+            <h4>Female</h4>
+            <p>N: <span id="sex-female-n">--</span></p>
+            <p>AD predictions: <span id="sex-female-ad">--</span></p>
+            <p>Mean score: <span id="sex-female-score">--</span></p>
+          </div>
+        </div>
+        <div class="config-info">
+          <h4>Model Configuration</h4>
+          <p><span class="hint" data-tooltip="Decision cutoff applied after calibration. Calibrated score ≥ this → predicted AD">Threshold</span>: <span id="cfg-threshold">--</span></p>
+          <p><span class="hint" data-tooltip="Score added to every female raw score before thresholding to equalize TPR across sexes">Calibration Δ</span>: <span id="cfg-delta">--</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Retrain Model</h3>
+      <p id="retrain-info" class="hint" data-tooltip="Trains a new AD model on the original training data plus all user-submitted corrections. Increments seed, saves new checkpoint.">Use accumulated corrections to retrain the model.</p>
+      <button id="btn-retrain" class="btn-secondary">Retrain Now</button>
+      <div id="retrain-result" class="hidden"></div>
+    </div>
+  </section>
+
+  <!-- ── History Tab ── -->
+  <section id="tab-history" class="tab">
+    <div class="card">
+      <h2>Prediction History</h2>
+      <div id="history-loading">Loading...</div>
+      <div id="history-content" class="hidden">
+        <table class="history-table">
+          <thead><tr>
+            <th>ID</th><th>Sex</th>
+            <th class="hint" data-tooltip="Raw AD probability from model after calibration">Score</th>
+            <th class="hint" data-tooltip="Calibrated score ≥ threshold → AD; below → MCI">Prediction</th>
+            <th class="hint" data-tooltip="True diagnosis submitted by user after review">Corrected</th>
+            <th>Time</th>
+          </tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+        <p id="history-empty" class="hidden">No predictions yet.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

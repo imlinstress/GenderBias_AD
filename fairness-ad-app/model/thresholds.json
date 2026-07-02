@@ -1,0 +1,122 @@
+{
+  "calibration_delta": 0.0054,
+  "winner": "delta=0.010: trade-off",
+  "deployed": {
+    "use_calibration": true,
+    "calibration_delta": 0.01,
+    "threshold": 0.0346,
+    "threshold_male": null,
+    "threshold_female": null,
+    "metrics": {
+      "ba": 0.8575,
+      "di": 1.0012,
+      "eod": 0.0,
+      "tpr_m": 1.0,
+      "tpr_f": 1.0,
+      "tnr_m": 0.6972,
+      "tnr_f": 0.7326
+    }
+  },
+  "strategies": {
+    "raw_ba_max": {
+      "tpr_M": 0.875,
+      "tnr_M": 0.9908,
+      "tpr_F": 0.7097,
+      "tnr_F": 0.9767,
+      "ba": 0.8881,
+      "eod": -0.1653,
+      "di": 0.9973,
+      "aod": -0.0897,
+      "t": 0.4483,
+      "tnr": 0.9838
+    },
+    "raw_tradeoff": {
+      "tpr_M": 1.0,
+      "tnr_M": 0.7248,
+      "tpr_F": 0.9677,
+      "tnr_F": 0.7558,
+      "ba": 0.8621,
+      "eod": -0.0323,
+      "di": 0.9913,
+      "aod": -0.0006,
+      "t": 0.0395,
+      "tnr": 0.7403,
+      "score": 0.0409
+    },
+    "raw_eod_min": {
+      "tpr_M": 1.0,
+      "tnr_M": 0.3394,
+      "tpr_F": 1.0,
+      "tnr_F": 0.5233,
+      "ba": 0.7157,
+      "eod": 0.0,
+      "di": 0.8343,
+      "aod": 0.0919,
+      "t": 0.01,
+      "tnr": 0.4314
+    },
+    "calibrated_ba_max": {
+      "tpr_M": 0.875,
+      "tnr_M": 0.9908,
+      "tpr_F": 0.7097,
+      "tnr_F": 0.9767,
+      "ba": 0.8881,
+      "eod": -0.1653,
+      "di": 0.9973,
+      "aod": -0.0897,
+      "t": 0.4483,
+      "tnr": 0.9838
+    },
+    "calibrated_tradeoff": {
+      "tpr_M": 1.0,
+      "tnr_M": 0.6972,
+      "tpr_F": 1.0,
+      "tnr_F": 0.7558,
+      "ba": 0.8633,
+      "eod": 0.0,
+      "di": 0.9641,
+      "aod": 0.0293,
+      "t": 0.0346,
+      "tnr": 0.7265,
+      "score": 0.0359
+    },
+    "delta_0.010_ba_max": {
+      "tpr_M": 0.875,
+      "tnr_M": 0.9908,
+      "tpr_F": 0.7097,
+      "tnr_F": 0.9767,
+      "ba": 0.8881,
+      "eod": -0.1653,
+      "di": 0.9973,
+      "aod": -0.0897,
+      "t": 0.4483,
+      "tnr": 0.9838
+    },
+    "delta_0.010_tradeoff": {
+      "tpr_M": 1.0,
+      "tnr_M": 0.6972,
+      "tpr_F": 1.0,
+      "tnr_F": 0.7326,
+      "ba": 0.8575,
+      "eod": 0.0,
+      "di": 1.0012,
+      "aod": 0.0177,
+      "t": 0.0346,
+      "tnr": 0.7149,
+      "score": 0.0012
+    },
+    "per_sex_di_constrained": {
+      "t_m": 0.0346,
+      "t_f": 0.0248,
+      "ba": 0.8575,
+      "di": 1.0012,
+      "eod": 0.0,
+      "tnr": 0.7149,
+      "score": 0.0012,
+      "tpr_M": 1.0,
+      "tpr_F": 1.0,
+      "tnr_M": 0.6972,
+      "tnr_F": 0.7326
+    }
+  }
+}

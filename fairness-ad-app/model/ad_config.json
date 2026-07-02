@@ -1,0 +1,21 @@
+{
+  "scope_name": "deb_ad",
+  "seed": 49,
+  "unprivileged_groups": [
+    {
+      "Sex": 1
+    }
+  ],
+  "privileged_groups": [
+    {
+      "Sex": 0
+    }
+  ],
+  "protected_attribute_name": "Sex",
+  "adversary_loss_weight": 0.1,
+  "num_epochs": 50,
+  "batch_size": 128,
+  "classifier_num_hidden_units": 200,
+  "debias": true,
+  "features_dim": 128
+}
